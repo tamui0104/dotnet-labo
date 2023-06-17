@@ -1,6 +1,7 @@
-
-
 using dotnet_labo;
+using dotnet_labo.Db;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Sqlite;
 using Microsoft.VisualBasic;
 
 var name = Name.Parse("tommy");
@@ -21,7 +22,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<SampleDbContext>();
+var connectionString = builder.Configuration.GetConnectionString("Sample") ?? "Data Source=Sample.db";
+builder.Services.AddSqlite<SampleDbContext>(connectionString);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,32 +35,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/person", async (SampleDbContext db) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateTime.Now.AddDays(index),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    await DbInitializer.SeedingAsync(db);
+    return await db.PersonDB.ToListAsync();
 })
-    .WithName("GetWeatherForecast");
+    .WithName("GetPerson");
 
 app.Run();
-
-
-
-record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
-
-
