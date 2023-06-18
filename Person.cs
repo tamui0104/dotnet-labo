@@ -61,4 +61,4 @@ public static class IJsonExtension
 
 }
 
-public record PersonDB(int Id, string Name, int Age);
+public record PersonDB(int Id, string Name, int Age) : IJson<PersonDB>;

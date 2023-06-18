@@ -38,7 +38,9 @@ app.UseHttpsRedirection();
 app.MapGet("/person", async (SampleDbContext db) =>
 {
     await DbInitializer.SeedingAsync(db);
-    return await db.PersonDB.ToListAsync();
+    return await db.PersonDB
+        .Select(p => p.ToJson().To<Person>())
+        .ToListAsync();
 })
     .WithName("GetPerson");
 
