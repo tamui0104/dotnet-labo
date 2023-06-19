@@ -6,6 +6,7 @@ using Microsoft.VisualBasic;
 
 var name = Name.Parse("tommy");
 Person p1 = new(new("tommy"), new(45));
+p1.Greet();
 Person p2 = new(new("tommy"), new(45));
 System.Console.WriteLine(p1 == p2);
 Console.WriteLine(p1.ToJson());

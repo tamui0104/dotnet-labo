@@ -22,7 +22,11 @@ public interface IJson<TSelf>
 
 internal static class UnitOfOptions
 {
-    public const UnitGenerateOptions Default = UnitGenerateOptions.JsonConverter | UnitGenerateOptions.ParseMethod | UnitGenerateOptions.Validate | UnitGenerateOptions.EntityFrameworkValueConverter;
+    public const UnitGenerateOptions Default = UnitGenerateOptions.JsonConverter
+                                            | UnitGenerateOptions.ParseMethod
+                                            | UnitGenerateOptions.Validate
+                                            | UnitGenerateOptions.EntityFrameworkValueConverter
+                                            | UnitGenerateOptions.ImplicitOperator;
 }
 
 [UnitOf(typeof(string), UnitOfOptions.Default)]
@@ -44,9 +48,18 @@ public readonly partial struct Age
     }
 }
 
-public record Person(Name Name, Age Age) : IJson<Person>;
+public interface I_Name { public Name Name { get; } }
 
-public record Item(Name Name) : IJson<Item>;
+
+public record Person(Name Name, Age Age) : IJson<Person>, I_Name;
+
+public record Item(Name Name) : IJson<Item>, I_Name;
+
+public static class NameExtention
+{
+    public static void Greet(this I_Name name) => System.Console.WriteLine($"hello {name.Name}");
+}
+
 public static class IJsonExtension
 {
     public static T? To<T>(this string s) where T : IJson<T>
